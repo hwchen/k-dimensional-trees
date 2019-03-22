@@ -9,31 +9,41 @@ pub trait KdbNode {
 pub struct KdbTree {
     // split on the "k" dimension (referencing
     // the indexing of the point tuple)
-    split: Split,
-    left: Box<KdbNode>,
-    right: Box<KdbNode>,
+    // There should be one less split than children
+    splits: Vec<Split>,
+    children: Vec<Box<KdbNode>>,
 }
 
 impl fmt::Display for KdbTree {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let pad = "    ";
-        let mut out = self.right.to_string(&pad, "↱ ");
-        out.push_str(&format!("\n{:?}\n", self.split));
-        out.push_str(&self.left.to_string(&pad, "↳ "));
+        let mut out = self.children[self.children.len() - 1]
+            .to_string(&pad, "↦ ");
+
+        for i in (0..self.splits.len()).rev() {
+            out.push_str(&format!("\n{:?}\n", self.splits[i]));
+            out.push_str(&self.children[i].to_string(&pad, "↦ "));
+        }
         write!(f, "{}\n", out)
+        //"↳ ""↱ "
     }
 }
 
 struct KdbInnerNode {
-    split: Split,
-    left: Box<KdbNode>,
-    right: Box<KdbNode>,
+    splits: Vec<Split>,
+    children: Vec<Box<KdbNode>>,
 }
 impl KdbNode for KdbInnerNode {
     fn to_string(&self, pad: &str, arrow: &str) -> String {
-        let mut out = self.right.to_string(&(pad.to_owned() + pad), "↱ ");
-        out.push_str(&format!("\n{}{}{:?}\n", pad, arrow, self.split));
-        out.push_str(&self.left.to_string(&(pad.to_owned() + pad), "↳ "));
+        let mut out = self.children[self.children.len() - 1]
+            .to_string(&(pad.to_owned() + pad), "↦ ");
+
+        for i in (0..self.splits.len()).rev() {
+            out.push_str(&format!("\n{}{}{:?}\n", pad, arrow, self.splits[i]));
+            out.push_str(&self.children[i]
+                .to_string(&(pad.to_owned() + pad), "↦ ")
+            );
+        }
         out
     }
 }
@@ -124,17 +134,17 @@ mod test {
         // children on "vertical"
 
         let tree = KdbTree {
-            split: Split { axis: 0, value: 0 },
-            left: Box::new(KdbInnerNode {
-                    split: Split { axis: 1, value: 0 },
-                    left: Box::new(leaf_4),
-                    right: Box::new(leaf_1),
-            }),
-            right: Box::new(KdbInnerNode {
-                    split: Split { axis: 1, value: 0 },
-                    left: Box::new(leaf_3),
-                    right: Box::new(leaf_2),
-            }),
+            splits: vec![Split { axis: 0, value: 0 }],
+            children: vec![
+                Box::new(KdbInnerNode {
+                    splits: vec![Split { axis: 1, value: 0 }],
+                    children: vec![ Box::new(leaf_4), Box::new(leaf_1)],
+                }),
+                Box::new(KdbInnerNode {
+                    splits: vec![Split { axis: 1, value: 0 }],
+                    children: vec![ Box::new(leaf_3), Box::new(leaf_2)],
+                }),
+            ],
         };
 
         println!("{}", tree);
