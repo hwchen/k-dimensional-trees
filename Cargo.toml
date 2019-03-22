@@ -1,0 +1,7 @@
+[package]
+name = "bkd-tree"
+version = "0.1.0"
+authors = ["Walther Chen <walther.chen@gmail.com>"]
+edition = "2018"
+
+[dependencies]
