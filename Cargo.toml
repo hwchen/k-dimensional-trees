@@ -1,5 +1,5 @@
 [package]
-name = "bkd-tree"
+name = "k-dimensional-trees"
 version = "0.1.0"
 authors = ["Walther Chen <walther.chen@gmail.com>"]
 edition = "2018"
