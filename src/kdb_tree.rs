@@ -1,3 +1,17 @@
+// TODO determine how to split: use Bbox?
+
+// First basic with 2-dim integer points, and integer value-ids
+//   - basic tree structure
+//   - manually create tree
+//   - basic query
+//   - basic construct from bulk load
+//   - real tree structure
+//   - real construct from bulk load
+//   - real query
+//   - write to disk and read back nodes
+//   - bkd insert algorithm
+// then make generic structure work
+
 use std::fmt;
 
 use super::Point;
@@ -69,6 +83,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn basic_create_kdb_tree() {
         // leaf 1 top right quadrant
         let leaf_1 = KdbLeaf {

@@ -1,29 +1,24 @@
-/// Pointer points at a child which represents values
-/// - after values in previous child in list, (including prev child K)
-/// - up to and not including K
+/// collection of trees for k-dimensional values (points)
+/// - kd-tree, an in-memory binary tree
+/// - kdb-tree, an external (stored on disk) b-tree
+/// - bkd-tree, a hybrid external tree which has about the same
+///     performance as a kdb-tree, but much better amortized update
+///     times and index disk usage.
 
-// First basic with 2-dim integer points, and integer value-ids
-//   - basic tree structure
-//   - manually create tree
-//   - basic query
-//   - basic construct from bulk load
-//   - real tree structure
-//   - real construct from bulk load
-//   - real query
-//   - write to disk and read back nodes
-//   - bkd insert algorithm
-// then make generic structure work
+// Starting out with only 2 dimensions, and only on integers
 
+mod kd_tree;
+pub use kd_tree::KdTree;
+
+/// Currently experimental, only basic outline of structure implemented
 mod kdb_tree;
+pub use kdb_tree::KdbTree;
 
-use kdb_tree::KdbTree;
-
-#[derive(Debug)]
+/// An interface to allow support for k-dimensional points (integers and
+/// floats). But for now, only allows 2 dimensions, and only integers
+#[derive(Debug, PartialEq, Eq)]
 pub struct Point {
     x: i64,
     y: i64,
 }
 
-pub struct BkdTree {
-    subtrees: Vec<KdbTree>,
-}
