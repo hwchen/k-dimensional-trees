@@ -37,6 +37,9 @@ impl KdTree {
             //   - if it's !equal to point, then travel to l/r child
             //     depending on if point is < v, or >= v by setting
             //     `v_idx = 2*v_idx + (1|2);`
+            //
+            //     Even levels split orthogonal to x axis (vertical line)
+            //     Odd levels split orthogonal to y axis (horizontal line)
 
             // dimension is either x or y for now; in future support k dims.
             // dimension is 0-indexed
@@ -74,7 +77,7 @@ impl KdTree {
         // if v_idx is outside of vec len, extend vec len. This is inexpensive
         //   because vec allocates full capacity at beginning.
         if v_idx >= self.buffer.len() {
-            let extension = (0..=self.buffer.len() - v_idx)
+            let extension = (0..= v_idx - self.buffer.len())
                 .map(|_| None);
 
             self.buffer.extend(extension);
@@ -96,6 +99,24 @@ mod test {
         let mut tree = KdTree::with_buffer_capacity(10);
         tree.insert(Point { x: 5, y: 5 });
 
-        assert_eq!(tree.buffer, vec![Some(Point {x: 5, y: 5 })])
+        // root splits on x, so this is left node
+        tree.insert(Point { x: 4, y: 6 });
+
+        // root splits on x, so this is left node of root
+        // then it's the left node of that one
+        tree.insert(Point { x: 3, y: 5 });
+
+        // left node of root, right node of childe
+        tree.insert(Point { x: 4, y: 7 });
+
+        assert_eq!(tree.buffer,
+            vec![
+                Some(Point { x: 5, y: 5 }),
+                Some(Point { x: 4, y: 6 }),
+                None,
+                Some(Point { x: 3, y: 5 }),
+                Some(Point { x: 4, y: 7 }),
+            ],
+        );
     }
 }
